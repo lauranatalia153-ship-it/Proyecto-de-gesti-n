@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<!-- saved from url=(0059)file:///C:/Users/paula/Downloads/dashboard_pacientes_1.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard – Percepción del Paciente | Educación en Enfermería</title>
+<link href="./Percepción del Paciente_files/css2" rel="stylesheet">
+<script src="./Percepción del Paciente_files/chart.umd.min.js.descarga"></script>
+<style>
+:root {
+  --bg: #f5f3ef;
+  --surface: #ffffff;
+  --surface2: #f0ede8;
+  --border: rgba(0,0,0,0.08);
+  --ink: #1a1a2e;
+  --muted: #7c7b7b;
+  --green: #1a8a6e;
+  --green-light: #d4f0e8;
+  --red: #c0392b;
+  --red-light: #fce8e6;
+  --amber: #d97706;
+  --amber-light: #fef3c7;
+  --blue: #1e6fa8;
+  --blue-light: #dbeafe;
+  --radius: 18px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+/* HEADER */
+header {
+  background: var(--ink);
+  color: white;
+  padding: 52px 52px 40px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+}
+header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -1px;
+}
+header h1 em { color: #6ee7b7; font-style: normal; }
+header p { margin-top: 10px; font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 300; letter-spacing: 0.3px; }
+.header-stats {
+  display: flex; gap: 32px; align-items: flex-end;
+}
+.hstat { text-align: right; }
+.hstat-num { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; color: #6ee7b7; line-height: 1; }
+.hstat-label { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* MAIN */
+.main { padding: 40px 52px 60px; }
+.section-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--muted); margin: 36px 0 16px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+
+/* GRID */
+.grid { display: grid; gap: 18px; }
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: 1fr 1fr 1fr; }
+.g4 { grid-template-columns: repeat(4,1fr); }
+.g32 { grid-template-columns: 3fr 2fr; }
+.g23 { grid-template-columns: 2fr 3fr; }
+.span2 { grid-column: span 2; }
+
+/* CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.card-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--ink); }
+.card-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* KPI cards */
+.kpi {
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  display: flex; flex-direction: column; gap: 6px;
+  position: relative; overflow: hidden;
+}
+.kpi-value { font-family: 'Syne', sans-serif; font-size: 56px; font-weight: 800; line-height: 1; }
+.kpi-label { font-size: 12px; font-weight: 500; opacity: 0.7; margin-top: 4px; }
+.kpi-sub { font-size: 12px; opacity: 0.55; }
+.kpi.green { background: var(--green); color: white; }
+.kpi.amber { background: var(--amber); color: white; }
+.kpi.blue { background: var(--blue); color: white; }
+.kpi.red { background: var(--red); color: white; }
+.kpi-icon { position: absolute; right: 20px; bottom: 16px; font-size: 48px; opacity: 0.12; }
+
+/* SCORE ROW */
+.score-row { display: flex; flex-direction: column; gap: 10px; }
+.sr-item { display: grid; grid-template-columns: 1fr 56px; gap: 8px; align-items: center; }
+.sr-text { font-size: 12px; color: var(--ink); line-height: 1.3; }
+.sr-pct { font-size: 14px; font-weight: 600; text-align: right; }
+.sr-bar-wrap { grid-column: 1/-1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+.sr-bar { height: 100%; border-radius: 3px; transition: width 1.2s ease; }
+
+/* STACKED BARS */
+.stacked-wrap { display: flex; flex-direction: column; gap: 12px; }
+.stk-item { display: flex; flex-direction: column; gap: 5px; }
+.stk-label { font-size: 11.5px; color: var(--ink); font-weight: 500; line-height: 1.3; }
+.stk-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; gap: 1px; }
+.stk-seg { transition: width 1.2s ease; flex-shrink: 0; }
+.stk-nums { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+
+/* LEGEND */
+.legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+/* CLINIC COMPARISON */
+.clinic-grid { display: flex; flex-direction: column; gap: 16px; }
+.clinic-row { display: flex; flex-direction: column; gap: 6px; }
+.clinic-header { display: flex; justify-content: space-between; align-items: baseline; }
+.clinic-name { font-size: 13px; font-weight: 600; }
+.clinic-score { font-size: 20px; font-weight: 800; font-family: 'Syne', sans-serif; }
+.clinic-bar-track { height: 10px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
+.clinic-bar-fill { height: 100%; border-radius: 5px; transition: width 1.2s ease; }
+.clinic-sub { font-size: 11px; color: var(--muted); }
+
+/* COMMENTS */
+.comment-list { display: flex; flex-direction: column; gap: 10px; max-height: 340px; overflow-y: auto; padding-right: 4px; }
+.comment-list::-webkit-scrollbar { width: 4px; }
+.comment-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.comment-item {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #333;
+  border-left: 3px solid transparent;
+}
+.comment-item.pos { border-color: var(--green); }
+.comment-item.neg { border-color: var(--red); }
+.comment-item.sug { border-color: var(--amber); }
+
+/* INSIGHT */
+.insight-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.insight {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.insight-icon { font-size: 30px; margin-bottom: 10px; }
+.insight-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.insight-body { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+.insight.green { border-top: 3px solid var(--green); }
+.insight.red { border-top: 3px solid var(--red); }
+.insight.amber { border-top: 3px solid var(--amber); }
+
+/* RADAR */
+.chart-wrap canvas { max-height: 260px; }
+
+/* DONUT WRAP */
+.donut-wrap canvas { max-height: 200px; }
+
+@media(max-width:900px){
+  .g2,.g3,.g4,.g32,.g23,.insight-grid { grid-template-columns: 1fr; }
+  header, .main { padding: 24px; }
+  .header-stats { flex-direction: column; gap: 12px; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Percepción del Paciente sobre la<br><em>Educación en Enfermería</em></h1>
+    <p>Revisión de historias clínicas — Clínicas Reina Sofía, Pediátrica y Medicina Especializada 125 &nbsp;|&nbsp; Febrero 2026</p>
+  </div>
+  <div class="header-stats">
+    <div class="hstat">
+      <div class="hstat-num">102</div>
+      <div class="hstat-label">Pacientes encuestados</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num">3</div>
+      <div class="hstat-label">Clínicas evaluadas</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-num">11</div>
+      <div class="hstat-label">Indicadores medidos</div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- KPI ROW -->
+  <div class="section-label">Indicadores globales de satisfacción</div>
+  <div class="grid g4">
+    <div class="kpi green">
+      <div class="kpi-value">82%</div>
+      <div class="kpi-label">Satisfacción general</div>
+      <div class="kpi-sub">84 de 102 pacientes</div>
+      <div class="kpi-icon">😊</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-value">85%</div>
+      <div class="kpi-label">Contribuye a recuperación</div>
+      <div class="kpi-sub">87 de 102 pacientes</div>
+      <div class="kpi-icon">❤️</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-value">65%</div>
+      <div class="kpi-label">Cuidados en casa</div>
+      <div class="kpi-sub">Área más débil detectada</div>
+      <div class="kpi-icon">🏠</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-value">9%</div>
+      <div class="kpi-label">Insatisfacción neta</div>
+      <div class="kpi-sub">9 pacientes disconformes</div>
+      <div class="kpi-icon">⚠️</div>
+    </div>
+  </div>
+
+  <!-- SCORES POR INDICADOR + LIKERT MAPA -->
+  <div class="section-label">Análisis por indicador</div>
+  <div class="grid g23">
+
+    <div class="card">
+      <div>
+        <div class="card-title">Puntuación positiva por ítem</div>
+        <div class="card-sub">% respuestas "De acuerdo" + "Totalmente de acuerdo" — base 102</div>
+      </div>
+      <div class="score-row">
+        <!-- Each indicator -->
+        <div class="sr-item">
+          <div class="sr-text">Resuelve dudas claramente</div>
+          <div class="sr-pct" style="color:var(--green)">85%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:85%;background:var(--green)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Contribuye a recuperación</div>
+          <div class="sr-pct" style="color:var(--green)">85%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:85%;background:var(--green)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Coherencia con otros profesionales</div>
+          <div class="sr-pct" style="color:var(--green)">84%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:84%;background:var(--green)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Satisfacción general con la educación</div>
+          <div class="sr-pct" style="color:var(--green)">82%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:82%;background:var(--green)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Brinda información clara sobre salud</div>
+          <div class="sr-pct" style="color:var(--green)">81%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:81%;background:var(--green)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Explica condición de salud actual</div>
+          <div class="sr-pct" style="color:var(--green)">81%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:81%;background:var(--green)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Educación brindada en momento oportuno</div>
+          <div class="sr-pct" style="color:var(--green)">81%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:81%;background:var(--green)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Disposición para repetir explicaciones</div>
+          <div class="sr-pct" style="color:var(--blue)">79%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:79%;background:var(--blue)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Explica signos de alerta</div>
+          <div class="sr-pct" style="color:var(--amber)">74%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:74%;background:var(--amber)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">Recomendaciones para prevenir complicaciones</div>
+          <div class="sr-pct" style="color:var(--amber)">66%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:66%;background:var(--amber)"></div></div>
+        </div>
+        <div class="sr-item">
+          <div class="sr-text">⚠️ Orienta cuidados en casa</div>
+          <div class="sr-pct" style="color:var(--red)">65%</div>
+          <div class="sr-bar-wrap"><div class="sr-bar" style="width:65%;background:var(--red)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-title">Distribución Likert — ítem a ítem</div>
+        <div class="card-sub">Cada barra = 100% de respuestas (n=102)</div>
+      </div>
+      <div class="stacked-wrap">
+        <!-- Brinda información clara -->
+        <div class="stk-item">
+          <div class="stk-label">Información clara sobre salud</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:44.1%;background:#1a8a6e" title="Totalmente de acuerdo: 45"></div>
+            <div class="stk-seg" style="width:37.3%;background:#7ecdb8" title="De acuerdo: 38"></div>
+            <div class="stk-seg" style="width:5.9%;background:#d1c9c0" title="Neutral: 6"></div>
+            <div class="stk-seg" style="width:5.9%;background:#e09090" title="En desacuerdo: 6"></div>
+            <div class="stk-seg" style="width:6.8%;background:#c0392b" title="Tot. en desacuerdo: 7"></div>
+          </div>
+        </div>
+        <!-- Resuelve dudas -->
+        <div class="stk-item">
+          <div class="stk-label">Resuelve dudas claramente</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:43.1%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:42.2%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:3.9%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:2.9%;background:#e09090"></div>
+            <div class="stk-seg" style="width:7.8%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Disposición -->
+        <div class="stk-item">
+          <div class="stk-label">Disposición para repetir</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:44.1%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:35.3%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:7.8%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:4.9%;background:#e09090"></div>
+            <div class="stk-seg" style="width:7.8%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Explica condición -->
+        <div class="stk-item">
+          <div class="stk-label">Explica condición de salud</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:51%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:30.4%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:6.9%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:4.9%;background:#e09090"></div>
+            <div class="stk-seg" style="width:6.9%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Signos alerta -->
+        <div class="stk-item">
+          <div class="stk-label">⚠️ Explica signos de alerta</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:42.2%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:31.4%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:7.8%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:13.7%;background:#e09090"></div>
+            <div class="stk-seg" style="width:4.9%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Cuidados en casa -->
+        <div class="stk-item">
+          <div class="stk-label">⚠️ Orienta cuidados en casa</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:31.4%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:33.3%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:16.7%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:9.8%;background:#e09090"></div>
+            <div class="stk-seg" style="width:8.8%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Prevenir complicaciones -->
+        <div class="stk-item">
+          <div class="stk-label">⚠️ Prevenir complicaciones</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:29.4%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:36.3%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:18.6%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:9.8%;background:#e09090"></div>
+            <div class="stk-seg" style="width:5.9%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Coherencia -->
+        <div class="stk-item">
+          <div class="stk-label">Coherencia con otros profesionales</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:42.2%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:42.2%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:4.9%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:3.9%;background:#e09090"></div>
+            <div class="stk-seg" style="width:6.9%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Momento adecuado -->
+        <div class="stk-item">
+          <div class="stk-label">Momento adecuado para educar</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:41.2%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:40.2%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:9.8%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:2.9%;background:#e09090"></div>
+            <div class="stk-seg" style="width:5.9%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Satisfacción -->
+        <div class="stk-item">
+          <div class="stk-label">Satisfacción general</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:45.1%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:37.3%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:8.8%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:2.9%;background:#e09090"></div>
+            <div class="stk-seg" style="width:5.9%;background:#c0392b"></div>
+          </div>
+        </div>
+        <!-- Contribuye -->
+        <div class="stk-item">
+          <div class="stk-label">Contribuye a recuperación</div>
+          <div class="stk-bar">
+            <div class="stk-seg" style="width:52%;background:#1a8a6e"></div>
+            <div class="stk-seg" style="width:33.3%;background:#7ecdb8"></div>
+            <div class="stk-seg" style="width:4.9%;background:#d1c9c0"></div>
+            <div class="stk-seg" style="width:4.9%;background:#e09090"></div>
+            <div class="stk-seg" style="width:4.9%;background:#c0392b"></div>
+          </div>
+        </div>
+      </div>
+      <div class="legend">
+        <div class="leg"><div class="leg-dot" style="background:#1a8a6e"></div>Tot. de acuerdo</div>
+        <div class="leg"><div class="leg-dot" style="background:#7ecdb8"></div>De acuerdo</div>
+        <div class="leg"><div class="leg-dot" style="background:#d1c9c0"></div>Neutral</div>
+        <div class="leg"><div class="leg-dot" style="background:#e09090"></div>En desacuerdo</div>
+        <div class="leg"><div class="leg-dot" style="background:#c0392b"></div>Tot. en desacuerdo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISTRIBUCIÓN + CLÍNICAS + RADAR -->
+  <div class="section-label">Distribución de la muestra y comparativo por clínica</div>
+  <div class="grid g3">
+
+    <!-- CLINIC + SERVICE distrib -->
+    <div class="card">
+      <div>
+        <div class="card-title">Clínica y servicio</div>
+        <div class="card-sub">102 pacientes en 3 sedes</div>
+      </div>
+      <div class="chart-wrap donut-wrap">
+        <canvas id="chartClinica" width="476" height="300" style="display: block; box-sizing: border-box; height: 200px; width: 317px;"></canvas>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span>🏥 Hospitalización</span><span style="font-weight:600">66 (65%)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span>🔪 Cirugía</span><span style="font-weight:600">14 (14%)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span>❤️ Cardiología</span><span style="font-weight:600">5 (5%)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span>🚨 Urgencias</span><span style="font-weight:600">5 (5%)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span>🫀 Urología + Gastro + UCI</span><span style="font-weight:600">12 (12%)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SATISFACTION BY CLINIC -->
+    <div class="card">
+      <div>
+        <div class="card-title">Satisfacción por clínica</div>
+        <div class="card-sub">% pacientes satisfechos o muy satisfechos</div>
+      </div>
+      <div class="clinic-grid">
+        <div class="clinic-row">
+          <div class="clinic-header">
+            <span class="clinic-name">Clínica Pediátrica y de la Mujer</span>
+            <span class="clinic-score" style="color:var(--green)">95%</span>
+          </div>
+          <div class="clinic-bar-track"><div class="clinic-bar-fill" style="width:95%;background:var(--green)"></div></div>
+          <div class="clinic-sub">36 de 38 pacientes satisfechos</div>
+        </div>
+        <div class="clinic-row">
+          <div class="clinic-header">
+            <span class="clinic-name">Clínica Reina Sofía</span>
+            <span class="clinic-score" style="color:var(--blue)">77%</span>
+          </div>
+          <div class="clinic-bar-track"><div class="clinic-bar-fill" style="width:77%;background:var(--blue)"></div></div>
+          <div class="clinic-sub">39 de 51 pacientes satisfechos</div>
+        </div>
+        <div class="clinic-row">
+          <div class="clinic-header">
+            <span class="clinic-name">Medicina Especializada 125</span>
+            <span class="clinic-score" style="color:var(--amber)">67%</span>
+          </div>
+          <div class="clinic-bar-track"><div class="clinic-bar-fill" style="width:67%;background:var(--amber)"></div></div>
+          <div class="clinic-sub">8 de 12 pacientes satisfechos</div>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border-radius:10px;padding:14px;font-size:12px;color:var(--muted);line-height:1.6;margin-top:4px">
+        <strong style="color:var(--ink)">Brecha de 28 puntos porcentuales</strong> entre la sede de mayor y menor satisfacción. La Clínica Pediátrica sobresale notablemente.
+      </div>
+    </div>
+
+    <!-- RADAR -->
+    <div class="card">
+      <div>
+        <div class="card-title">Perfil de competencias percibidas</div>
+        <div class="card-sub">Puntuación positiva por dimensión (radar)</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartRadar" width="476" height="390" style="display: block; box-sizing: border-box; height: 260px; width: 317px;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMENTARIOS -->
+  <div class="section-label">Voz del paciente — comentarios cualitativos</div>
+  <div class="grid g2">
+    <div class="card">
+      <div>
+        <div class="card-title">Temas en sugerencias</div>
+        <div class="card-sub">Análisis de respuestas abiertas — principales categorías</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartTemas" width="771" height="385" style="display: block; box-sizing: border-box; height: 257px; width: 514px;"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div>
+        <div class="card-title">Testimonios destacados</div>
+        <div class="card-sub"><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:2px;margin-right:4px"></span>Positivos &nbsp;<span style="display:inline-block;width:10px;height:10px;background:var(--amber);border-radius:2px;margin-right:4px"></span>Sugerencias &nbsp;<span style="display:inline-block;width:10px;height:10px;background:var(--red);border-radius:2px;margin-right:4px"></span>Negativos</div>
+      </div>
+      <div class="comment-list">
+        <div class="comment-item pos">"Felicito a Geraldine la auxiliar de enfermería, quien siempre fue muy amable, explicativa y dispuesta a ayudar."</div>
+        <div class="comment-item pos">"Sigan siendo los excelentes seres humanos y excelentes profesionales que son. Muchas gracias."</div>
+        <div class="comment-item sug">"Mayor sentido humano, y mayor tiempo de interpretación para con los pacientes."</div>
+        <div class="comment-item sug">"Mejorar la empatía en el momento de brindar la información."</div>
+        <div class="comment-item sug">"Que estén dispuestos a resolver dudas de los familiares también, no solo al paciente."</div>
+        <div class="comment-item sug">"Brindar información más seguido y no dejar a un paciente tanto tiempo sin saber su evolución."</div>
+        <div class="comment-item sug">"Tomar un minuto para hablar con el paciente, saber sus miedos o inquietudes."</div>
+        <div class="comment-item neg">"No nos han informado cuáles son los síntomas del problema de salud, ya llevan 4 días y no nos dicen qué tiene."</div>
+        <div class="comment-item neg">"La jefa no muestra interés por la necesidad del paciente. La espera es muy larga."</div>
+        <div class="comment-item neg">"En el cambio de turno no nos explicaron porque se cambia el tratamiento."</div>
+        <div class="comment-item neg">"La administración de medicamentos no está clara."</div>
+        <div class="comment-item sug">"Conocer un poco más del proceso antes del ingreso a cirugía."</div>
+        <div class="comment-item pos">"He tenido experiencias muy positivas con la eficiencia y amabilidad del personal de enfermería."</div>
+        <div class="comment-item sug">"Que hablen más despacio para poder entender."</div>
+        <div class="comment-item pos">"No sé les puede exigir tanto porque están muy cargados de trabajo y hacen todo lo posible."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="section-label">Hallazgos clave y recomendaciones</div>
+  <div class="insight-grid">
+    <div class="insight green">
+      <div class="insight-icon">✅</div>
+      <div class="insight-title">Alta satisfacción general</div>
+      <div class="insight-body">El 82% de pacientes está satisfecho con la educación recibida. La coherencia con otros profesionales (84%) y la contribución a la recuperación (85%) son los puntos más sólidos del servicio.</div>
+    </div>
+    <div class="insight amber">
+      <div class="insight-icon">🏠</div>
+      <div class="insight-title">Brecha en educación de egreso</div>
+      <div class="insight-body">Los ítems más bajos son "cuidados en casa" (65%) y "prevención de complicaciones" (66%). Los pacientes sienten que la educación disminuye cuando se aproxima el alta hospitalaria.</div>
+    </div>
+    <div class="insight red">
+      <div class="insight-icon">🤝</div>
+      <div class="insight-title">Empatía como demanda clave</div>
+      <div class="insight-body">La mayoría de comentarios negativos y sugerencias apuntan a mejorar la empatía, el trato humano y el tiempo dedicado a escuchar dudas de pacientes y familiares.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+Chart.defaults.font.family = 'Inter';
+Chart.defaults.color = '#7c7b7b';
+
+const green = '#1a8a6e'; const blue = '#1e6fa8'; const amber = '#d97706';
+const red = '#c0392b'; const teal2 = '#0d9488';
+
+// CLINICA DONUT
+new Chart(document.getElementById('chartClinica'),{
+  type:'doughnut',
+  data:{
+    labels:['Reina Sofía','Pediátrica y Mujer','Med. Especializada 125'],
+    datasets:[{
+      data:[51,38,12],
+      backgroundColor:[blue, green, amber],
+      borderColor:'#fff',
+      borderWidth:3,
+      hoverOffset:6
+    }]
+  },
+  options:{
+    cutout:'65%',
+    plugins:{
+      legend:{ position:'bottom', labels:{ padding:12, boxWidth:10, font:{size:11} } }
+    }
+  }
+});
+
+// RADAR
+new Chart(document.getElementById('chartRadar'),{
+  type:'radar',
+  data:{
+    labels:['Info. clara','Resuelve dudas','Disposición','Explica condición','Signos alerta','Cuidados casa','Previene complic.','Coherencia','Oportunidad','Satisfacción','Recuperación'],
+    datasets:[{
+      label:'% positivo',
+      data:[81,85,79,81,74,65,66,84,81,82,85],
+      backgroundColor:'rgba(26,138,110,0.15)',
+      borderColor:green,
+      borderWidth:2,
+      pointBackgroundColor:green,
+      pointRadius:4
+    }]
+  },
+  options:{
+    scales:{
+      r:{
+        min:50, max:100,
+        ticks:{ stepSize:10, font:{size:10} },
+        grid:{ color:'rgba(0,0,0,0.07)' },
+        pointLabels:{ font:{size:10}, color:'#555' }
+      }
+    },
+    plugins:{ legend:{ display:false } }
+  }
+});
+
+// TEMAS BAR
+new Chart(document.getElementById('chartTemas'),{
+  type:'bar',
+  data:{
+    labels:['Felicitaciones / Satisfacción','Empatía y trato humano','Más información / continuidad','Educación al familiar','Hablar más despacio / claridad','Proceso antes de cirugía','Tiempo de espera'],
+    datasets:[{
+      label:'Menciones',
+      data:[18, 9, 6, 3, 2, 2, 2],
+      backgroundColor:[green, amber, blue, teal2, red, '#8b5cf6','#ec4899'],
+      borderRadius:8,
+      borderSkipped:false
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    plugins:{ legend:{display:false},
+      tooltip:{ callbacks:{ label:(c)=>` ${c.parsed.x} menciones` } }
+    },
+    scales:{
+      x:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:11}} },
+      y:{ grid:{display:false}, ticks:{font:{size:11}} }
+    }
+  }
+});
+</script>
+
+
+</body></html>

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<!-- saved from url=(0060)file:///C:/Users/paula/Downloads/dashboard_enfermeria_1.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard – Educación al Paciente | Profesionales de Enfermería</title>
+<link href="./Dashboard –Profesionales de Enfermería_files/css2" rel="stylesheet">
+<script src="./Dashboard –Profesionales de Enfermería_files/chart.umd.min.js.descarga"></script>
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: rgba(255,255,255,0.07);
+    --teal: #00d4b4;
+    --teal-dim: rgba(0,212,180,0.15);
+    --coral: #ff6b6b;
+    --coral-dim: rgba(255,107,107,0.15);
+    --gold: #f5c842;
+    --gold-dim: rgba(245,200,66,0.15);
+    --lavender: #a78bfa;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px;
+    background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,212,180,0.08), transparent);
+  }
+
+  /* HEADER */
+  header {
+    padding: 48px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .header-left h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 3vw, 40px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .header-left h1 span { color: var(--teal); }
+  .header-left p {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .header-badge {
+    background: var(--teal-dim);
+    border: 1px solid rgba(0,212,180,0.3);
+    color: var(--teal);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+  }
+
+  /* LAYOUT */
+  .main { padding: 40px 48px; }
+  .grid { display: grid; gap: 20px; }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+
+  /* KPI */
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s;
+  }
+  .kpi:hover { transform: translateY(-2px); }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi.k-teal::before { background: linear-gradient(90deg, var(--teal), transparent); }
+  .kpi.k-coral::before { background: linear-gradient(90deg, var(--coral), transparent); }
+  .kpi.k-gold::before { background: linear-gradient(90deg, var(--gold), transparent); }
+  .kpi.k-lav::before { background: linear-gradient(90deg, var(--lavender), transparent); }
+  .kpi-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+  .kpi-value { font-size: 52px; font-weight: 700; line-height: 1; margin: 8px 0 4px; }
+  .kpi.k-teal .kpi-value { color: var(--teal); }
+  .kpi.k-coral .kpi-value { color: var(--coral); }
+  .kpi.k-gold .kpi-value { color: var(--gold); }
+  .kpi.k-lav .kpi-value { color: var(--lavender); }
+  .kpi-sub { font-size: 13px; color: var(--muted); }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: transform .2s;
+  }
+  .card:hover { transform: translateY(-2px); }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .chart-wrap { position: relative; }
+  .chart-wrap canvas { max-height: 240px; }
+
+  /* HORIZONTAL BAR */
+  .hbar { display: flex; flex-direction: column; gap: 12px; }
+  .hbar-item { display: flex; flex-direction: column; gap: 4px; }
+  .hbar-header { display: flex; justify-content: space-between; align-items: center; }
+  .hbar-label { font-size: 13px; color: var(--text); font-weight: 500; }
+  .hbar-pct { font-size: 13px; font-weight: 600; }
+  .hbar-track { height: 8px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
+  .hbar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+  /* LIKERT TABLE */
+  .likert { display: flex; flex-direction: column; gap: 14px; }
+  .likert-row { display: flex; flex-direction: column; gap: 6px; }
+  .likert-question { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .likert-bars { display: flex; height: 12px; border-radius: 6px; overflow: hidden; gap: 1px; }
+  .likert-seg { transition: width 1s ease; }
+  .likert-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+  .leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* QUOTES */
+  .quotes { display: flex; flex-direction: column; gap: 12px; }
+  .quote {
+    background: var(--surface2);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    font-style: italic;
+  }
+  .quote.coral { border-color: var(--coral); }
+  .quote.gold { border-color: var(--gold); }
+
+  /* TAGS */
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tag-count {
+    background: var(--teal-dim);
+    color: var(--teal);
+    border-radius: 100px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* DIVIDER */
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    padding: 32px 0 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+  }
+
+  /* insight callout */
+  .insight {
+    background: linear-gradient(135deg, rgba(0,212,180,0.08), rgba(167,139,250,0.06));
+    border: 1px solid rgba(0,212,180,0.2);
+    border-radius: var(--radius);
+    padding: 22px 28px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .insight-icon { font-size: 28px; flex-shrink: 0; }
+  .insight-title { font-weight: 600; font-size: 14px; color: var(--teal); margin-bottom: 4px; }
+  .insight-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  @media(max-width: 900px) {
+    .g2, .g3, .g4 { grid-template-columns: 1fr; }
+    header, .main { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Educación al Paciente en<br><span>Enfermería Clínica</span></h1>
+    <p>Análisis de encuesta — Clínica Reina Sofía &nbsp;|&nbsp; Febrero 2026 &nbsp;|&nbsp; 39 respuestas</p>
+  </div>
+  <div class="header-badge">📊 Dashboard Interactivo</div>
+</header>
+
+<div class="main">
+
+  <!-- KPIs -->
+  <div class="grid g4">
+    <div class="kpi k-teal">
+      <div class="kpi-label">Total encuestados</div>
+      <div class="kpi-value">39</div>
+      <div class="kpi-sub">Profesionales de enfermería</div>
+    </div>
+    <div class="kpi k-coral">
+      <div class="kpi-label">Brindan educación</div>
+      <div class="kpi-value">90%</div>
+      <div class="kpi-sub">35 de 39 afirman hacerlo</div>
+    </div>
+    <div class="kpi k-gold">
+      <div class="kpi-label">Carga laboral como barrera</div>
+      <div class="kpi-value">64%</div>
+      <div class="kpi-sub">25 profesionales afectados</div>
+    </div>
+    <div class="kpi k-lav">
+      <div class="kpi-label">Apoyan educación ind.</div>
+      <div class="kpi-value">97%</div>
+      <div class="kpi-sub">38 de 39 totalmente/de acuerdo</div>
+    </div>
+  </div>
+
+  <!-- Clínica + Turno + Servicio -->
+  <div class="section-label">Distribución de la muestra</div>
+  <div class="grid g3">
+
+    <div class="card">
+      <div>
+        <div class="card-title">Clínica</div>
+        <div class="card-sub">Distribución por sede</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartClinica" width="478" height="360" style="display: block; box-sizing: border-box; height: 240px; width: 318px;"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-title">Servicio actual</div>
+        <div class="card-sub">Área de trabajo</div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">Hospitalización</span><span class="hbar-pct" style="color:var(--teal)">77%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:77%;background:var(--teal)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">Cirugía</span><span class="hbar-pct" style="color:var(--lavender)">13%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:13%;background:var(--lavender)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">UCI Adultos</span><span class="hbar-pct" style="color:var(--gold)">5%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:5%;background:var(--gold)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">Consulta Externa</span><span class="hbar-pct" style="color:var(--coral)">3%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:3%;background:var(--coral)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">Urgencias</span><span class="hbar-pct" style="color:var(--coral)">3%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:3%;background:var(--coral)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-title">Turno</div>
+        <div class="card-sub">Distribución por jornada</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartTurno" width="478" height="360" style="display: block; box-sizing: border-box; height: 240px; width: 318px;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIKERT SECTION -->
+  <div class="section-label">Percepción sobre la educación al paciente</div>
+  <div class="grid g2">
+
+    <div class="card">
+      <div>
+        <div class="card-title">Mapa de percepciones</div>
+        <div class="card-sub">Escala Likert — todas las preguntas evaluativas</div>
+      </div>
+      <div class="likert">
+        <!-- Q1: TIEMPOS -->
+        <div class="likert-row">
+          <div class="likert-question">¿Los <strong>tiempos</strong> son adecuados para brindar la educación?</div>
+          <div class="likert-bars">
+            <!-- TA:4, A:10, N:6, OC:10, D:8, TD:1 -->
+            <div class="likert-seg" style="width:10.3%;background:#00d4b4" title="Totalmente de acuerdo: 4"></div>
+            <div class="likert-seg" style="width:25.6%;background:#6ee7d1" title="De acuerdo: 10"></div>
+            <div class="likert-seg" style="width:15.4%;background:#94a3b8" title="Neutral: 6"></div>
+            <div class="likert-seg" style="width:25.6%;background:#f5c842" title="Ocasionalmente: 10"></div>
+            <div class="likert-seg" style="width:20.5%;background:#ff6b6b" title="En desacuerdo: 8"></div>
+            <div class="likert-seg" style="width:2.6%;background:#c0392b" title="Total. en desacuerdo: 1"></div>
+          </div>
+        </div>
+        <!-- Q2: HERRAMIENTAS -->
+        <div class="likert-row">
+          <div class="likert-question">¿Las <strong>herramientas</strong> disponibles son adecuadas?</div>
+          <div class="likert-bars">
+            <!-- TA:9, A:21, OC:6, N:3 -->
+            <div class="likert-seg" style="width:23.1%;background:#00d4b4" title="Totalmente de acuerdo: 9"></div>
+            <div class="likert-seg" style="width:53.8%;background:#6ee7d1" title="De acuerdo: 21"></div>
+            <div class="likert-seg" style="width:15.4%;background:#f5c842" title="Ocasionalmente: 6"></div>
+            <div class="likert-seg" style="width:7.7%;background:#94a3b8" title="Neutral: 3"></div>
+          </div>
+        </div>
+        <!-- Q3: CARGA LABORAL -->
+        <div class="likert-row">
+          <div class="likert-question">¿La <strong>carga laboral</strong> es un impedimento para educar?</div>
+          <div class="likert-bars">
+            <!-- TA:13, A:12, OC:9, D:3, N:2 -->
+            <div class="likert-seg" style="width:33.3%;background:#ff6b6b" title="Totalmente de acuerdo: 13"></div>
+            <div class="likert-seg" style="width:30.8%;background:#ffa07a" title="De acuerdo: 12"></div>
+            <div class="likert-seg" style="width:23.1%;background:#f5c842" title="Ocasionalmente: 9"></div>
+            <div class="likert-seg" style="width:7.7%;background:#6ee7d1" title="En desacuerdo: 3"></div>
+            <div class="likert-seg" style="width:5.1%;background:#94a3b8" title="Neutral: 2"></div>
+          </div>
+        </div>
+        <!-- Q4: INDIVIDUALIZACIÓN -->
+        <div class="likert-row">
+          <div class="likert-question">¿La educación debe ser <strong>individualizada</strong> por paciente?</div>
+          <div class="likert-bars">
+            <!-- TA:24, A:14, TD:1 -->
+            <div class="likert-seg" style="width:61.5%;background:#00d4b4" title="Totalmente de acuerdo: 24"></div>
+            <div class="likert-seg" style="width:35.9%;background:#6ee7d1" title="De acuerdo: 14"></div>
+            <div class="likert-seg" style="width:2.6%;background:#c0392b" title="Total. en desacuerdo: 1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="likert-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#00d4b4"></div>Totalmente de acuerdo</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#6ee7d1"></div>De acuerdo</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#94a3b8"></div>Neutral</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f5c842"></div>Ocasionalmente</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#ff6b6b"></div>En desacuerdo</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#c0392b"></div>Total. en desacuerdo</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-title">Carga laboral como barrera</div>
+        <div class="card-sub">¿Impide brindar y registrar la educación?</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chartCarga" width="775" height="360" style="display: block; box-sizing: border-box; height: 240px; width: 517px;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUÉ PODRÍA FACILITAR -->
+  <div class="section-label">¿Qué podría facilitar la educación al paciente?</div>
+  <div class="grid g2">
+    <div class="card">
+      <div>
+        <div class="card-title">Temas más mencionados</div>
+        <div class="card-sub">Análisis de respuestas abiertas — 39 comentarios</div>
+      </div>
+      <div class="hbar">
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">🔴 Reducción de carga laboral</span><span class="hbar-pct" style="color:var(--coral)">~49%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:49%;background:var(--coral)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">📄 Material didáctico (folletos, cartillas)</span><span class="hbar-pct" style="color:var(--gold)">~36%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:36%;background:var(--gold)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">⏱ Más tiempo asignado</span><span class="hbar-pct" style="color:var(--lavender)">~21%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:21%;background:var(--lavender)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">📋 Herramientas digitales / formularios</span><span class="hbar-pct" style="color:var(--teal)">~13%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:13%;background:var(--teal)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">🤝 Trabajo interdisciplinario</span><span class="hbar-pct" style="color:var(--teal)">~10%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:10%;background:var(--teal)"></div></div>
+        </div>
+        <div class="hbar-item">
+          <div class="hbar-header"><span class="hbar-label">🎓 Apoyo de estudiantes</span><span class="hbar-pct" style="color:#64748b)">~5%</span></div>
+          <div class="hbar-track"><div class="hbar-fill" style="width:5%;background:#64748b)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div>
+        <div class="card-title">Voces del equipo</div>
+        <div class="card-sub">Testimonios representativos</div>
+      </div>
+      <div class="quotes">
+        <div class="quote">"Menor labor administrativa por parte de las jefe para alcanzar a realizar las tareas verdaderamente importantes de enfermería como la educación."</div>
+        <div class="quote coral">"Folletos y planes de educación para cada paciente… algo visual para facilitar."</div>
+        <div class="quote gold">"Si la carga de pacientes o la relación enfermera-paciente fuera menor, daría más tiempo a brindar una mejor educación."</div>
+        <div class="quote">"Un forms o lista de chequeo para acortar tiempos."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="section-label">Hallazgos clave</div>
+  <div class="grid g3">
+    <div class="insight">
+      <div class="insight-icon">✅</div>
+      <div>
+        <div class="insight-title">Alta adopción de la práctica</div>
+        <div class="insight-body">El 90% del equipo afirma brindar educación y comunicarla en el cambio de turno, evidenciando una cultura de continuidad del cuidado.</div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">⚠️</div>
+      <div>
+        <div class="insight-title">Carga laboral: principal barrera</div>
+        <div class="insight-body">El 64% la señala como impedimento real. La relación enfermera/paciente elevada y la carga administrativa reducen el tiempo disponible.</div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">📚</div>
+      <div>
+        <div class="insight-title">Demanda de recursos didácticos</div>
+        <div class="insight-body">Folletos, cartillas y ayudas audiovisuales por patología son las soluciones más solicitadas. El 77% percibe las herramientas actuales como adecuadas, pero quiere más.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Chart defaults
+Chart.defaults.color = '#64748b';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.07)';
+
+const teal = '#00d4b4';
+const coral = '#ff6b6b';
+const gold = '#f5c842';
+const lav = '#a78bfa';
+const dim = (c) => c + '33';
+
+// CLINICA pie
+new Chart(document.getElementById('chartClinica'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Reina Sofía', 'Pediátrica y de la Mujer', 'Colsanitas MA'],
+    datasets: [{
+      data: [26, 12, 1],
+      backgroundColor: [teal, lav, gold],
+      borderColor: '#111827',
+      borderWidth: 3,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    cutout: '68%',
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 14, boxWidth: 10, font: { size: 11 } } }
+    }
+  }
+});
+
+// TURNO pie
+new Chart(document.getElementById('chartTurno'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Tarde', 'Mañana'],
+    datasets: [{
+      data: [21, 18],
+      backgroundColor: [coral, teal],
+      borderColor: '#111827',
+      borderWidth: 3,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    cutout: '68%',
+    plugins: {
+      legend: { position: 'bottom', labels: { padding: 14, boxWidth: 10, font: { size: 11 } } }
+    }
+  }
+});
+
+// CARGA LABORAL bar
+new Chart(document.getElementById('chartCarga'), {
+  type: 'bar',
+  data: {
+    labels: ['Total. de acuerdo', 'De acuerdo', 'Ocasionalmente', 'En desacuerdo', 'Neutral'],
+    datasets: [{
+      label: 'Respuestas',
+      data: [13, 12, 9, 3, 2],
+      backgroundColor: [coral, '#ffa07a', gold, teal, '#64748b'],
+      borderRadius: 8,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => ` ${ctx.parsed.x} respuestas (${Math.round(ctx.parsed.x/39*100)}%)`
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: 11 } } },
+      y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+</script>
+
+
+</body></html>
